@@ -49,14 +49,19 @@ def check_port(host: str, port: int, timeout: int=3) -> tuple:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.settimeout(timeout)
 
-        result = client.connect_ex((host, port))
+        try:
+            result = client.connect_ex((host, port))
+        except socket.gaierror as e:
+            print(f"Ошибка разрешения ip адреса {e}")
+            return (host, port, 'invalid')
 
         if result == 0:
             status = 'open'
         else:
-            status = 'close'
+            status = 'closed'
     
     return (host, port, status)
+
 
 
 def main():
