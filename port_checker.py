@@ -28,7 +28,7 @@ def write_checked_ip(file: str, data: list) -> bool:
     """Функция записывает в файл хосты с открытым портом"""
     try:
         with open(file, 'w', encoding="utf-8") as f:
-            f.writelines(f"{line}\n" for line in data)
+            f.writelines(f"{line[0]}:{line[1]} {line[2]}\n" for line in data)
         print(f"Данные проверки успешно записаны в файл {file}")
         return True
     except PermissionError:
