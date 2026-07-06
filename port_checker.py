@@ -1,3 +1,9 @@
+"""
+ТЗ
+1. Напишите функцию, которая принимает IP-адрес и порт, и возвращает кортеж `(ip, port, status)`, где статус – строка `"open"` или `"closed"`. Используйте `socket.connect_ex()` для проверки.
+2. Прочитайте файл `ips.txt` (каждый IP с новой строки) и для каждого IP проверьте порт 80, запишите открытые IP в файл `open_ips.txt`.
+"""
+
 import socket
 # from datetime import datetime as dt
 
@@ -40,16 +46,16 @@ def write_checked_ip(file: str, data: list) -> bool:
 
 def check_port(host: str, port: int, timeout: int=3) -> tuple:
     """Функция проверяет хост на открытый порт"""
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.settimeout(timeout)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+        client.settimeout(timeout)
 
-    result = client.connect_ex((host, port))
+        result = client.connect_ex((host, port))
 
-    if result == 0:
-        status = 'open'
-    else:
-        status = 'close'
-
+        if result == 0:
+            status = 'open'
+        else:
+            status = 'close'
+    
     return (host, port, status)
 
 
@@ -58,7 +64,7 @@ def main():
     ips = read_ip_list_from_file('ips.txt')
 
     for host in ips:
-        line = check_port(host, 3389)
+        line = check_port(host, 80)
         if line[2] == 'open':
             result_list.append(line)
         else:
