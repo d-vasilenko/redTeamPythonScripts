@@ -72,8 +72,6 @@ def main():
         line = check_port(host, 80)
         if line[2] == 'open':
             result_list.append(line)
-        else:
-            continue
     
     print(result_list)
 
