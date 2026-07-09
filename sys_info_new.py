@@ -4,29 +4,42 @@ import importlib.metadata as metadata
 from typing import Dict
 
 def get_pip_info() -> dict:
-    pip_list = [
-        f"{dist.metadata['Name']}=={dist.metadata['Version']}" for dist in metadata.distributions()
-    ]
-    return sorted(pip_list)
+    pips_dict = {}
+    try:
+        for item in metadata.distributions():
+            pips_dict[f"{item.metadata['Name']}"] = item.metadata['Version']
+        return pips_dict
+    except Exception as e:
+        print(f"Error: {e}")
+        return {}
 
-def view_pip_install_list(pip_list: list) -> bool:
-    for item in pip_list:
-        name, version = item.split('==')[0], item.split('==')[1]
-        print(f"{name:20} Versin: {version}")
-    return True
+
+def view_pip_install_list(pip_list: dict) -> bool:
+    try:
+        for key in pip_list:
+            print(f"{key:20} {pip_list[key]}")
+        return True
+    except Exception as e:
+        print(f"Error: {e}")
+        return False
 
 def view_info(info_dict: dict) -> bool:
-    print("=" * 10, "System Info", "=" * 10)
-    for key in info_dict:
-        if isinstance(info_dict[key], list):
-            print("=" * 11, "Pip List", "=" * 11)
-            view_pip_install_list(info_dict[key])
-        else:
-            print(f"{key:20} {info_dict[key]}")
-    print("=" * 40)
-    return True
+    try:
+        print("=" * 10, "System Info", "=" * 10)
+        for key in info_dict:
+            if isinstance(info_dict[key], dict):
+                print("=" * 11, "Pip List", "=" * 11)
+                view_pip_install_list(get_pip_info())
+            else:
+                print(f"{key:20} {info_dict[key]}")
+        print("=" * 40)
+        return True
+    except Exception as e:
+        print(f"Error: {e}")
+        return False
 
 def get_system_info() -> dict:
+    
     info = {
         "python_version": platform.python_version(),
         "system_name": platform.system(),
@@ -37,8 +50,9 @@ def get_system_info() -> dict:
 
 def main():
 
-    view_info(get_system_info())
+    state = get_system_info()
 
+    view_info(state)
     
 if __name__ == "__main__":
 
