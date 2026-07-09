@@ -27,15 +27,21 @@ def read_ip_list_from_file(file: str) -> list:
     try:
         with open(file, 'r', encoding="utf-8") as f:
             for line in f:
-                ip_list.append(line.strip())
+                ip = line.strip()
+                if ip:
+                    ip_list.append(ip)
     except FileNotFoundError:
         logging.error("Ошибка: Файл не найден!")
+        raise
     except PermissionError:
         logging.error("Ошибка: Нет прав для чтения файла!")
+        raise
     except UnicodeDecodeError:
         logging.error("Ошибка: Проблемма с кодировкой файла!")
-    except Exception as e:
-        logging.error(f"Неизвестная ошибка: {e}")
+        raise
+    # except Exception as e:
+    #     logging.error(f"Неизвестная ошибка: {e}")
+    #     raise
     return ip_list
 
 def write_checked_ip(file: str, data: list) -> bool:
@@ -56,20 +62,20 @@ def write_checked_ip(file: str, data: list) -> bool:
     try:
         with open(file, 'w', encoding="utf-8") as f:
             f.writelines(f"{line[0]}:{line[1]} {line[2]}\n" for line in data)
-        logging.info(f"Данные проверки успешно записаны в файл {file}")
+        print(f"Данные проверки успешно записаны в файл {file}")
         return True
-    except PermissionError:
-        logging.error("Нет прав для записи файла!")
-    except IsADirectoryError:
-        logging.error("Путь являеться директорией!")
+    # except PermissionError:
+    #     logging.error("Нет прав для записи файла!")
+    # except IsADirectoryError:
+    #     logging.error("Путь являеться директорией!")
     except OSError as e:
         logging.error(f"Ошибка ОС при записи в {file}: {e}")
-    except UnicodeEncodeError as e:
-        logging.error(f"Ошибкаа кодировки: {e}")
-    except Exception as e:
-        logging.error(f"Неожиданная ошибка: {e}")
+        return False
+    # except UnicodeEncodeError as e:
+    #     logging.error(f"Ошибкаа кодировки: {e}")
+    # except Exception as e:
+    #     logging.error(f"Неожиданная ошибка: {e}")
     
-    return False
 
 def check_port(host: str, port: int, timeout: int=3) -> Tuple[str, int, str]:
     """
@@ -110,17 +116,21 @@ def main():
         if line[2] == 'open':
             result_list.append(line)
     
-    logging.info(result_list)
+    # logging.info(result_list)
+    if result_list:
+        print(f"[+] Найдено открытыв хостов: {len(result_list)}")
+    else:
+        print(f"[-] Открытых хостов не найдено.")
 
     write_checked_ip("open_hosts.txt", result_list)    
 
 if __name__ == "__main__":
     
     # tests
-    check_port("127.0.0.1", 22)
-    check = check_port("abc", 80)
-    logging.info(check)
-    check = check_port("192.168.10.60", 80, timeout=2)
-    logging.info(check)
+    logging.disable(logging.CRITICAL)
+    assert check_port("127.0.0.1", 22)[2] in ("open", "closed")
+    assert check_port("abs", 80)[2] == "invalid"
+    print("[v] Все тесты пройдены!")
 
+    logging.disable(logging.NOTSET)
     main()
