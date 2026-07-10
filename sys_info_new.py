@@ -3,7 +3,15 @@ import platform
 import importlib.metadata as metadata
 from typing import Dict
 
-def get_pip_info() -> dict:
+def get_pip_info() -> Dict[str, str]:
+    """
+    Функция возвращает словарь, ключи имена установленных pip пакетов, значения - версии.
+    Args:
+    Returns:
+        dict(str: str) - результирующий словарь.
+    Exeptions:
+
+    """
     pips_dict = {}
     try:
         for item in metadata.distributions():
@@ -14,7 +22,15 @@ def get_pip_info() -> dict:
         return {}
 
 
-def view_pip_install_list(pip_list: dict) -> bool:
+def print_pip_install_list(pip_list: dict) -> bool:
+    """
+    Функция которая выводит в консоль установленные pip пакеты.
+    Args:
+        dict - словарь ключи - имена пакетов, значения - версии
+    Returns:
+        bool(True) - если ввывод успешный
+        bool(False) - если вывод не успешный
+    """
     try:
         for key in pip_list:
             print(f"{key:20} {pip_list[key]}")
@@ -29,7 +45,7 @@ def view_info(info_dict: dict) -> bool:
         for key in info_dict:
             if isinstance(info_dict[key], dict):
                 print("=" * 11, "Pip List", "=" * 11)
-                view_pip_install_list(get_pip_info())
+                print_pip_install_list(info_dict[key])
             else:
                 print(f"{key:20} {info_dict[key]}")
         print("=" * 40)
